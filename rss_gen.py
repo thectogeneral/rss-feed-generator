@@ -19,8 +19,14 @@ async def get_doc_from_url(url):
     except httpx.HTTPStatusError as e:
         if "Redirect response" in str(e):
             raise ChannelNotFound()
-
+    
+async def channel_not_found(doc):
+    elems = doc.select("div[class='tgme_page_description']")
+    if elems and elems[0].text.strip().startswith("If you have Telegram, you can contact @"):
+        return True
 
 async def channel_to_rss(channel):
     url = f"https://t.me/s/{channel}"
     doc = await get_doc_from_url(url)
+    if channel_not_found(doc):
+        raise ChannelNotFound()
