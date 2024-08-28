@@ -1,5 +1,7 @@
 from flask import Flask
 import os
+import httpx
+from bs4 import BeautifulSoup
 
 
 app = Flask(__name__)
