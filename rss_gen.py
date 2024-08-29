@@ -33,10 +33,8 @@ async def rss(channel):
     except ChannelNotFound:
         return f"Channel not found or it cannot be previewed at https://t.me/s/{channel}", 404
 
-
-async def get_message_divs(doc):
+def get_message_divs(doc):
     return doc.select("div[class~='tgme_widget_message_bubble']")
-
 
 def get_text_from_div(div):
     elems = div.select("div[class~='tgme_widget_message_text']")
@@ -66,7 +64,7 @@ async def get_doc_from_url(url):
         if "Redirect response" in str(e):
             raise ChannelNotFound()
     
-async def channel_not_found(doc):
+def channel_not_found(doc):
     elems = doc.select("div[class='tgme_page_description']")
     if elems and elems[0].text.strip().startswith("If you have Telegram, you can contact @"):
         return True
