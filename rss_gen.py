@@ -1,11 +1,13 @@
 from flask import Flask, make_response
 import os
 import httpx
+import re
 from bs4 import BeautifulSoup
 from rfeed import Feed, Item
 from datetime import datetime
 from flask_caching import Cache
 from asgiref.wsgi import WsgiToAsgi
+from textwrap import shorten
 
 
 app = Flask(__name__)
@@ -34,6 +36,22 @@ async def rss(channel):
 
 async def get_message_divs(doc):
     return doc.select("div[class~='tgme_widget_message_bubble']")
+
+
+def get_text_from_div(div):
+    elems = div.select("div[class~='tgme_widget_message_text']")
+    if elems:
+        return elems[0].get_text("\n", strip=True)
+    else:
+        return get_link_from_div(div)
+
+def get_item_from_div(div):
+    return {
+        "link": get_link_from_div(div),
+        "title": shorten(get_text_from_div(div), width=250, placeholder="..."),
+        "description": get_text_from_div(div),
+        "pubDate": datetime.fromisoformat(div.select("time[class='time']")[0].attrs["datetime"]),
+    }
 
 def get_link_from_div(div):
     return div.select("a[href][class='tgme_widget_message_date']")[0].attrs["href"]
