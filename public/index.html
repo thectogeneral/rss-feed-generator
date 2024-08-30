@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <title>RSS feed from any Telegram channel</title>
+  <style>
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 90vh;
+  text-align: center;
+  word-wrap: break-word;
+  background-color: #000;
+
+}
+h1 {
+  font-weight: normal;
+  font-size: 2.3em;
+  color: #fff;
+}
+div {
+  padding-top: 1em;
+}
+div.big {
+  font-size: 1.5em;
+  align-items: center;
+  text-align: center;
+  color: darkgray;
+}
+div.big label {
+  display: inline-block;
+  vertical-align: middle;
+}
+input {
+  margin-left: -0.2em;
+  border: 1px solid darkgray;
+  font-size: 1em;
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  input#channel {
+    width: 65%;
+  }
+}
+input:valid {
+  background-color: darkgray;
+}
+input:invalid {
+  background-color: lightpink;
+}
+div#source a, div#source a:visited {
+  color: gray;
+}
+#source {
+  padding-top: 4em;
+}
+</style>
+</head>
+<body>
+  <h1>Create RSS feed from a Telegram channel</h1>
+  <div class="big">
+    <label for="channel">t.me/</label>
+    <input type="text" name="channel" id="channel" size="25" placeholder="channel name, 5-32 symbols" pattern="^[A-Za-z][A-Za-z0-9_]{4,31}$" title="5 to 32 symbols: letters, digits and _, starting with a letter">
+  </div>
+  <div id="link" class="big">
+    Link to the RSS feed: <a id="rss_link" href=""></a>
+  </div>
+  <div id="source">
+    <a target="_blank" href="https://github.com/thectogenral/rss-feed-generator">Source on GitHub</a>
+  </div>
+  <script>
+    window.addEventListener("load", (event) => {
+        document.querySelector("#channel").addEventListener("input", (event) => {
+            link = "";
+            if (event.target.checkValidity() && event.target.value) {
+                link = "http://127.0.0.1:5000/" + event.target.value;
+            } 
+            elem = document.querySelector("#rss_link");
+            elem.href = link;
+            elem.innerText = link;
+        });
+        document.querySelector("#channel").addEventListener("paste", (event) => {
+            event.preventDefault();
+            let paste = (event.clipboardData || window.clipboardData).getData("text");
+            event.target.value = paste.replace(/@|((https:\/\/)?(t|telegram)\.me\/(s\/)?)/, "").replace(/\?.*$/, "").replace(/\W+/, "");
+            event.target.dispatchEvent(new Event("input"))
+        });
+    });
+  </script>
+</body>
+</html>
